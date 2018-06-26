@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原生网络请求了解下用多了ASIHttpRequest与AFNetWorking第三方网络框架难免对苹果底层的网络请求陌生，了解下苹果网络访问相关知识 一、URL Session的基本概念1.三种工作模式：1）默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。2）瞬时会话模式（eph">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS原生网络请求">
+<meta property="og:url" content="http://yoursite.com/2016/11/28/ios-networkRequest/index.html">
+<meta property="og:site_name" content="打工仔-吴克修のCODE有毒">
+<meta property="og:description" content="原生网络请求了解下用多了ASIHttpRequest与AFNetWorking第三方网络框架难免对苹果底层的网络请求陌生，了解下苹果网络访问相关知识 一、URL Session的基本概念1.三种工作模式：1）默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。2）瞬时会话模式（eph">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2908476-8b0db0966a807f58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-06-26T12:49:54.775Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS原生网络请求">
+<meta name="twitter:description" content="原生网络请求了解下用多了ASIHttpRequest与AFNetWorking第三方网络框架难免对苹果底层的网络请求陌生，了解下苹果网络访问相关知识 一、URL Session的基本概念1.三种工作模式：1）默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。2）瞬时会话模式（eph">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2908476-8b0db0966a807f58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/11/28/ios-networkRequest/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>iOS原生网络请求 | 打工仔-吴克修のCODE有毒</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">打工仔-吴克修のCODE有毒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">工作不止眼前的需求和Bug，还有诗和远方。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/28/ios-networkRequest/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吴克修">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="打工仔-吴克修のCODE有毒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS原生网络请求
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-11-28 22:11:25" itemprop="dateCreated datePublished" datetime="2016-11-28T22:11:25+08:00">2016-11-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-06-26 20:49:54" itemprop="dateModified" datetime="2018-06-26T20:49:54+08:00">2018-06-26</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="原生网络请求了解下"><a href="#原生网络请求了解下" class="headerlink" title="原生网络请求了解下"></a>原生网络请求了解下</h2><p>用多了ASIHttpRequest与AFNetWorking第三方网络框架难免对苹果底层的网络请求陌生，了解下苹果网络访问相关知识</p>
+<h3 id="一、URL-Session的基本概念"><a href="#一、URL-Session的基本概念" class="headerlink" title="一、URL Session的基本概念"></a>一、URL Session的基本概念</h3><p><strong>1.三种工作模式：</strong><br>1）默认会话模式（default）：工作模式类似于原来的NSURLConnection，使用的是基于磁盘缓存的持久化策略，使用用户keychain中保存的证书进行认证授权。<br>2）瞬时会话模式（ephemeral）：该模式不使用磁盘保存任何数据。所有和会话相关的caches，证书，cookies等都被保存在RAM中，因此当程序使会话无效，这些缓存的数据就会被自动清空。<br>3）后台会话模式（background）：该模式在后台完成上传和下载，在创建Configuration对象的时候需要提供一个NSString类型的ID用于标识完成工作的后台会话。   </p>
+<p><strong>2.NSURLSession支持的三种任务</strong><br>NSURLSession类支持三种类型的任务：加载数据，下载和上传。  </p>
+<h3 id="二、相关的类"><a href="#二、相关的类" class="headerlink" title="二、相关的类"></a>二、相关的类</h3><p>NSURLConnection这个名字，实际上指的是一组构成Foundation框架中URL加载系统的相互关联的组件：NSURLRequest，NSURLResponse，NSURLProtocol，NSURLCache，NSHTTPCookieStorage，NSURLCredentialStorage，以及和它同名的NSURLConnection。</p>
+<p>在WWDC 2013中，Apple的团队对NSURLConnection进行了重构，并推出了NSURLSession作为替代。  </p>
+<p>NSURLSession也是一组相互依赖的类，它的大部分组件和NSURLConnection中的组件相同如NSURLRequest，NSURLCache等。而NSURLSession的不同之处在于，它将NSURLConnection替换为NSURLSession和NSURLSessionConfiguration，以及3个NSURLSessionTask的子类：NSURLSessionDataTask, NSURLSessionUploadTask, 和NSURLSessionDownloadTask。   </p>
+<p><img src="http://upload-images.jianshu.io/upload_images/2908476-8b0db0966a807f58.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="关系图">  </p>
+<p>自己简单封装的网络工具类<br><strong>.h文件</strong>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">//  XMNetWorkHelper.h</span><br><span class="line">//  Created by 修么 on 16/11/28</span><br><span class="line">//  Copyright © 2016年 修么. All rights reserved.</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">#import &lt;Foundation/Foundation.h&gt;</span><br><span class="line">#import &lt;UIKit/UIKit.h&gt;</span><br><span class="line"></span><br><span class="line">typedef void (^XMCompletioBlock)(NSDictionary *dic, NSURLResponse *response, NSError *error);</span><br><span class="line">typedef void (^XMSuccessBlock)(NSDictionary *data);</span><br><span class="line">typedef void (^XMFailureBlock)(NSError *error);</span><br><span class="line"></span><br><span class="line">@interface XMNetWorkHelper : NSObject</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> *  get请求</span><br><span class="line"> */</span><br><span class="line">+ (void)getWithUrlString:(NSString *)url parameters:(id)parameters success:(XMSuccessBlock)successBlock failure:(XMFailureBlock)failureBlock;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * post请求</span><br><span class="line"> */</span><br><span class="line">+ (void)postWithUrlString:(NSString *)url parameters:(id)parameters success:(XMSuccessBlock)successBlock failure:(XMFailureBlock)failureBlock;</span><br></pre></td></tr></table></figure>
+<p><strong>.m文件</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line">//</span><br><span class="line">//  XMNetWorkHelper.m</span><br><span class="line">//</span><br><span class="line">//  Created by 修么 on 16/11/28.</span><br><span class="line">//  Copyright © 2016年 修么. All rights reserved.</span><br><span class="line">//</span><br><span class="line"></span><br><span class="line">#import &quot;XMNetWorkHelper.h&quot;</span><br><span class="line"></span><br><span class="line">@implementation XMNetWorkHelper</span><br><span class="line"></span><br><span class="line">//GET请求</span><br><span class="line">+ (void)getWithUrlString:(NSString *)url parameters:(id)parameters success:(XMSuccessBlock)successBlock failure:(XMFailureBlock)failureBlock</span><br><span class="line">&#123;</span><br><span class="line">    NSMutableString *mutableUrl = [[NSMutableString alloc] initWithString:url];</span><br><span class="line">    if ([parameters allKeys]) &#123;</span><br><span class="line">        [mutableUrl appendString:@&quot;?&quot;];</span><br><span class="line">        for (id key in parameters) &#123;</span><br><span class="line">            NSString *value = [[parameters objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];</span><br><span class="line">            [mutableUrl appendString:[NSString stringWithFormat:@&quot;%@=%@&amp;&quot;, key, value]];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    NSString *urlEnCode = [[mutableUrl substringToIndex:mutableUrl.length - 1] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];</span><br><span class="line">    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:urlEnCode]];</span><br><span class="line">    NSURLSession *urlSession = [NSURLSession sharedSession];</span><br><span class="line">    NSURLSessionDataTask *dataTask = [urlSession dataTaskWithRequest:urlRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        if (error) &#123;</span><br><span class="line">            failureBlock(error);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];</span><br><span class="line">            successBlock(dic);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">    [dataTask resume];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//POST请求 使用NSMutableURLRequest可以加入请求头</span><br><span class="line">+ (void)postWithUrlString:(NSString *)url parameters:(id)parameters success:(XMSuccessBlock)successBlock failure:(XMFailureBlock)failureBlock</span><br><span class="line">&#123;</span><br><span class="line">    NSURL *nsurl = [NSURL URLWithString:url];</span><br><span class="line">    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:nsurl];</span><br><span class="line">    //如果想要设置网络超时的时间的话，可以使用下面的方法：</span><br><span class="line">    //NSMutableURLRequest *mutableRequest=[NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10];</span><br><span class="line">    </span><br><span class="line">    //设置请求类型</span><br><span class="line">    request.HTTPMethod = @&quot;POST&quot;;</span><br><span class="line">    </span><br><span class="line">    //将需要的信息放入请求头 随便定义了几个</span><br><span class="line">    [request setValue:@&quot;xxx&quot; forHTTPHeaderField:@&quot;Authorization&quot;];//token</span><br><span class="line">    [request setValue:@&quot;xxx&quot; forHTTPHeaderField:@&quot;Gis-Lng&quot;];//坐标 lng</span><br><span class="line">    [request setValue:@&quot;xxx&quot; forHTTPHeaderField:@&quot;Gis-Lat&quot;];//坐标 lat</span><br><span class="line">    [request setValue:@&quot;xxx&quot; forHTTPHeaderField:@&quot;Version&quot;];//版本</span><br><span class="line">    NSLog(@&quot;POST-Header:%@&quot;,request.allHTTPHeaderFields);</span><br><span class="line">    </span><br><span class="line">    //把参数放到请求体内</span><br><span class="line">    NSString *postStr = [XMNetWorkHelper parseParams:parameters];</span><br><span class="line">    request.HTTPBody = [postStr dataUsingEncoding:NSUTF8StringEncoding];</span><br><span class="line">    </span><br><span class="line">    NSURLSession *session = [NSURLSession sharedSession];</span><br><span class="line">    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        if (error) &#123; //请求失败</span><br><span class="line">            failureBlock(error);</span><br><span class="line">        &#125; else &#123;  //请求成功</span><br><span class="line">            NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];</span><br><span class="line">            successBlock(dic);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;];</span><br><span class="line">    [dataTask resume];  //开始请求</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//重新封装参数 加入app相关信息</span><br><span class="line">+ (NSString *)parseParams:(NSDictionary *)params</span><br><span class="line">&#123;</span><br><span class="line">    NSMutableDictionary *parameters = [[NSMutableDictionary alloc] initWithDictionary:params];</span><br><span class="line">    [parameters setValue:@&quot;ios&quot; forKey:@&quot;client&quot;];</span><br><span class="line">    [parameters setValue:@&quot;请替换版本号&quot; forKey:@&quot;auth_version&quot;];</span><br><span class="line">    NSString* phoneModel = @&quot;获取手机型号&quot; ;</span><br><span class="line">    NSString* phoneVersion = [[UIDevice currentDevice] systemVersion];//ios系统版本号</span><br><span class="line">    NSString *system = [NSString stringWithFormat:@&quot;%@(%@)&quot;,phoneModel, phoneVersion];</span><br><span class="line">    [parameters setValue:system forKey:@&quot;system&quot;];</span><br><span class="line">    NSDate *date = [NSDate date];</span><br><span class="line">    NSTimeInterval timeinterval = [date timeIntervalSince1970];</span><br><span class="line">    [parameters setObject:[NSString stringWithFormat:@&quot;%.0lf&quot;,timeinterval] forKey:@&quot;auth_timestamp&quot;];//请求时间戳</span><br><span class="line">    NSString *devicetoken = @&quot;请替换DeviceToken&quot;;</span><br><span class="line">    [parameters setValue:devicetoken forKey:@&quot;uuid&quot;]</span><br><span class="line">    NSLog(@&quot;请求参数:%@&quot;,parameters);    </span><br><span class="line"></span><br><span class="line">    NSString *keyValueFormat;</span><br><span class="line">    NSMutableString *result = [NSMutableString new];</span><br><span class="line">    //实例化一个key枚举器用来存放dictionary的key</span><br><span class="line">   </span><br><span class="line">   //加密处理 将所有参数加密后结果当做参数传递</span><br><span class="line">   //parameters = @&#123;@&quot;i&quot;:@&quot;加密结果 抽空加入&quot;&#125;;</span><br><span class="line">   </span><br><span class="line">    NSEnumerator *keyEnum = [parameters keyEnumerator];</span><br><span class="line">    id key;</span><br><span class="line">    while (key = [keyEnum nextObject]) &#123;</span><br><span class="line">        keyValueFormat = [NSString stringWithFormat:@&quot;%@=%@&amp;&quot;, key, [params valueForKey:key]];</span><br><span class="line">        [result appendString:keyValueFormat];</span><br><span class="line">    &#125;</span><br><span class="line">    return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>NSURLSession文件下载</strong>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">//下载图片</span><br><span class="line">/**</span><br><span class="line"> 该下载方式不适合大文件下载，</span><br><span class="line"> 因为该方法需要等到文件下载完毕了，</span><br><span class="line"> 才会回调completionHandler后面的block参数，</span><br><span class="line"> 然后才可以在这个block参数可以获取location(文件下载缓存的路径)、response(响应)、error(错误信息)。</span><br><span class="line"> 这样的话，对于大文件，我们就无法实时的在下载过程中获取文件的下载进度了。</span><br><span class="line"> @param imgUrl 图片地址</span><br><span class="line"> */</span><br><span class="line">- (void)downloadImgWithUrl:(NSString *)imgUrl&#123;</span><br><span class="line">    //1.创建会话对象</span><br><span class="line">    NSURLSession *session = [NSURLSession sharedSession];</span><br><span class="line">    </span><br><span class="line">    //2.请求路径</span><br><span class="line">    NSURL *url = [NSURL URLWithString:imgUrl];</span><br><span class="line">    </span><br><span class="line">    //3.创建task</span><br><span class="line">    //接受到数据之后内部会直接写入到沙盒里面</span><br><span class="line">    //completionHandler location(文件下载缓存的路径)、response(响应)、error(错误信息)</span><br><span class="line">    NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        if (error == nil) &#123;</span><br><span class="line">            //5.接受数据</span><br><span class="line">            NSLog(@&quot;%@&quot;,location);</span><br><span class="line">            </span><br><span class="line">            //5.1确定文件的全路径</span><br><span class="line">            NSString *fullPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:response.suggestedFilename];</span><br><span class="line">            </span><br><span class="line">            //5.2 剪切文件</span><br><span class="line">            /*</span><br><span class="line">             第一个参数：要剪切的文件在哪里</span><br><span class="line">             第二个参数：目标地址</span><br><span class="line">             第三个参数：错误信息</span><br><span class="line">             */</span><br><span class="line">            NSError *fileError;</span><br><span class="line">            [[NSFileManager defaultManager] moveItemAtURL:location toURL:[NSURL fileURLWithPath:fullPath] error:&amp;fileError];</span><br><span class="line">            //打印</span><br><span class="line">            NSLog(@&quot;%@---%@&quot;,fullPath,[NSThread currentThread]);</span><br><span class="line">            if (fileError == nil) &#123;</span><br><span class="line">                NSLog(@&quot;file save success&quot;);</span><br><span class="line">            &#125; else &#123;</span><br><span class="line">                NSLog(@&quot;file save error: %@&quot;,fileError);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            NSLog(@&quot;download error:%@&quot;,error);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;];</span><br><span class="line">    </span><br><span class="line">    //4.启动task</span><br><span class="line">    [downloadTask resume];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//下载视频</span><br><span class="line">- (void)downloadVideoWithUrl:(NSString *)videoUrl&#123;</span><br><span class="line">    //1.创建会话对象</span><br><span class="line">    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];</span><br><span class="line">    </span><br><span class="line">    //2.请求路径</span><br><span class="line">    NSURL *url = [NSURL URLWithString:videoUrl];</span><br><span class="line">    </span><br><span class="line">    //3.创建task</span><br><span class="line">    NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url];</span><br><span class="line">    </span><br><span class="line">    //4.启动task</span><br><span class="line">    [downloadTask resume];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#pragma mark -NSURLSessionDownloadDelegate Function</span><br><span class="line">// 下载数据的过程中会调用的代理方法</span><br><span class="line">-(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite&#123;</span><br><span class="line">    NSLog(@&quot;%lf&quot;,1.0 * totalBytesWritten / totalBytesExpectedToWrite);</span><br><span class="line">&#125;</span><br><span class="line">// 重新恢复下载的代理方法</span><br><span class="line">-(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask</span><br><span class="line">didResumeAtOffset:(int64_t)fileOffset expectedTotalBytes:(int64_t)expectedTotalBytes&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line">// 写入数据到本地的时候会调用的方法</span><br><span class="line">-(void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask</span><br><span class="line">didFinishDownloadingToURL:(NSURL *)location&#123;</span><br><span class="line">    NSString* fullPath =</span><br><span class="line">    [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]</span><br><span class="line">     stringByAppendingPathComponent:downloadTask.response.suggestedFilename];;</span><br><span class="line">    [[NSFileManager defaultManager] moveItemAtURL:location</span><br><span class="line">                                            toURL:[NSURL fileURLWithPath:fullPath]</span><br><span class="line">                                            error:nil];</span><br><span class="line">    NSLog(@&quot;%@&quot;,fullPath);</span><br><span class="line">&#125;</span><br><span class="line">// 请求完成，错误调用的代理方法</span><br><span class="line">-(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>NSURLSession文件上传</strong>  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line">//第1种方式 以流的方式上传，大小理论上不受限制，但应注意时间</span><br><span class="line">-(void)uploadFileWithData:(NSData *)fileData&#123;</span><br><span class="line">    // 1.创建url 服务器上传脚本</span><br><span class="line">    NSString *urlString = @&quot;http://服务端/upload.php&quot;;</span><br><span class="line">    NSURL *url = [NSURL URLWithString:urlString];</span><br><span class="line">    </span><br><span class="line">    // 2.创建请求</span><br><span class="line">    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];</span><br><span class="line">    // 文件上传使用post</span><br><span class="line">    request.HTTPMethod = @&quot;POST&quot;;</span><br><span class="line">    </span><br><span class="line">    // 3.开始上传   request的body data将被忽略，而由fromData提供</span><br><span class="line">    [[[NSURLSession sharedSession] uploadTaskWithRequest:request fromData:fileData     completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        if (error == nil) &#123;</span><br><span class="line">            NSLog(@&quot;upload success：%@&quot;,[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            NSLog(@&quot;upload error:%@&quot;,error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;] resume];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//第2种方式 拼接表单的方式进行上传</span><br><span class="line">- (void)uploadWithFilePath:(NSString *)filePath withfileName:(NSString *)fileName &#123;</span><br><span class="line">    // 1.创建url  服务器上传脚本</span><br><span class="line">    NSString *urlString = @&quot;http://服务器/upload.php&quot;;</span><br><span class="line">    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];</span><br><span class="line">    NSURL *url = [NSURL URLWithString:urlString];</span><br><span class="line">    </span><br><span class="line">    // 2.创建请求</span><br><span class="line">    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];</span><br><span class="line">    // 文件上传使用post</span><br><span class="line">    request.HTTPMethod = @&quot;POST&quot;;</span><br><span class="line">    </span><br><span class="line">    NSString *contentType = [NSString stringWithFormat:@&quot;multipart/form-data; boundary=%@&quot;,@&quot;boundary&quot;];</span><br><span class="line">    </span><br><span class="line">    [request setValue:contentType forHTTPHeaderField:@&quot;Content-Type&quot;];</span><br><span class="line">    // 3.拼接表单，大小受MAX_FILE_SIZE限制(2MB)  FilePath:要上传的本地文件路径  formName:表单控件名称，应于服务器一致</span><br><span class="line">    NSData* data = [self getHttpBodyWithFilePath:filePath formName:@&quot;file&quot; reName:fileName];</span><br><span class="line">    request.HTTPBody = data;</span><br><span class="line">    // 根据需要是否提供，非必须,如果不提供，session会自动计算</span><br><span class="line">    [request setValue:[NSString stringWithFormat:@&quot;%lu&quot;,data.length] forHTTPHeaderField:@&quot;Content-Length&quot;];</span><br><span class="line">    </span><br><span class="line">    // 4.1 使用dataTask</span><br><span class="line">    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        if (error == nil) &#123;</span><br><span class="line">            NSLog(@&quot;upload success：%@&quot;,[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            NSLog(@&quot;upload error:%@&quot;,error);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">    &#125;] resume];</span><br><span class="line">#if 0</span><br><span class="line">    // 4.2 开始上传 使用uploadTask   fromData:可有可无，会被忽略</span><br><span class="line">    [[[NSURLSession sharedSession] uploadTaskWithRequest:request fromData:nil     completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        if (error == nil) &#123;</span><br><span class="line">            NSLog(@&quot;upload success：%@&quot;,[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            NSLog(@&quot;upload error:%@&quot;,error);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;] resume];</span><br><span class="line">#endif</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/// filePath:要上传的文件路径   formName：表单控件名称  reName：上传后文件名</span><br><span class="line">- (NSData *)getHttpBodyWithFilePath:(NSString *)filePath formName:(NSString *)formName reName:(NSString *)reName</span><br><span class="line">&#123;</span><br><span class="line">    NSMutableData *data = [NSMutableData data];</span><br><span class="line">    NSURLResponse *response = [self getLocalFileResponse:filePath];</span><br><span class="line">    // 文件类型：MIMEType  文件的大小：expectedContentLength  文件名字：suggestedFilename</span><br><span class="line">    NSString *fileType = response.MIMEType;</span><br><span class="line">    </span><br><span class="line">    // 如果没有传入上传后文件名称,采用本地文件名!</span><br><span class="line">    if (reName == nil) &#123;</span><br><span class="line">        reName = response.suggestedFilename;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 表单拼接</span><br><span class="line">    NSMutableString *headerStrM =[NSMutableString string];</span><br><span class="line">    [headerStrM appendFormat:@&quot;--%@\r\n&quot;,@&quot;boundary&quot;];</span><br><span class="line">    // name：表单控件名称  filename：上传文件名</span><br><span class="line">    [headerStrM appendFormat:@&quot;Content-Disposition: form-data; name=%@; filename=%@\r\n&quot;,formName,reName];</span><br><span class="line">    [headerStrM appendFormat:@&quot;Content-Type: %@\r\n\r\n&quot;,fileType];</span><br><span class="line">    [data appendData:[headerStrM dataUsingEncoding:NSUTF8StringEncoding]];</span><br><span class="line">    </span><br><span class="line">    // 文件内容</span><br><span class="line">    NSData *fileData = [NSData dataWithContentsOfFile:filePath];</span><br><span class="line">    [data appendData:fileData];</span><br><span class="line">    </span><br><span class="line">    NSMutableString *footerStrM = [NSMutableString stringWithFormat:@&quot;\r\n--%@--\r\n&quot;,@&quot;boundary&quot;];</span><br><span class="line">    [data appendData:[footerStrM  dataUsingEncoding:NSUTF8StringEncoding]];</span><br><span class="line">    //    NSLog(@&quot;dataStr=%@&quot;,[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);</span><br><span class="line">    return data;</span><br><span class="line">&#125;</span><br><span class="line">/// 获取响应，主要是文件类型和文件名</span><br><span class="line">- (NSURLResponse *)getLocalFileResponse:(NSString *)urlString</span><br><span class="line">&#123;</span><br><span class="line">    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];</span><br><span class="line">    // 本地文件请求</span><br><span class="line">    NSURL *url = [NSURL fileURLWithPath:urlString];</span><br><span class="line">    NSURLRequest *request = [NSURLRequest requestWithURL:url];</span><br><span class="line">    </span><br><span class="line">    __block NSURLResponse *localResponse = nil;</span><br><span class="line">    // 使用信号量实现NSURLSession同步请求</span><br><span class="line">    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);</span><br><span class="line">    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) &#123;</span><br><span class="line">        localResponse = response;</span><br><span class="line">        dispatch_semaphore_signal(semaphore);</span><br><span class="line">    &#125;] resume];</span><br><span class="line">    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);</span><br><span class="line">    return  localResponse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>上传服务端PHP脚本</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">//以文件流的形式上传文件</span><br><span class="line">&lt;?php</span><br><span class="line">/** 二进制流生成文件</span><br><span class="line"> * $_POST 无法解释二进制流，需要用到 $GLOBALS[&apos;HTTP_RAW_POST_DATA&apos;] 或 php://input</span><br><span class="line"> * $GLOBALS[&apos;HTTP_RAW_POST_DATA&apos;] 和 php://input 都不能用于 enctype=multipart/form-data</span><br><span class="line"> * @param    String  $file   要生成的文件路径</span><br><span class="line"> * @return   boolean</span><br><span class="line"> */</span><br><span class="line">function binary_to_file($file)&#123;</span><br><span class="line">    $content = $GLOBALS[&apos;HTTP_RAW_POST_DATA&apos;];          // 需要php.ini设置</span><br><span class="line">    if(empty($content))&#123;</span><br><span class="line">        $content = file_get_contents(&apos;php://input&apos;);    // 不需要php.ini设置，内存压力小</span><br><span class="line">    &#125;</span><br><span class="line">    $ret = file_put_contents($file, $content, true);</span><br><span class="line">    return $ret;</span><br><span class="line">&#125;</span><br><span class="line">$file_dir=&quot;images/image.png&quot;;  // 固定的文件名,注意设置images文件夹权限为所有用户可读写！！！</span><br><span class="line">binary_to_file($file_dir);</span><br><span class="line">?&gt;</span><br><span class="line"></span><br><span class="line">//以表单形式上传</span><br><span class="line">&lt;?php</span><br><span class="line">header(&quot;Content-type: application/json; charset=utf-8&quot;);</span><br><span class="line">// 配置文件需要上传到服务器的路径，需要允许所有用户有可写权限，否则无法上传！</span><br><span class="line">$uploaddir = &apos;images/&apos;;</span><br><span class="line">// file表单名称，应与客户端一致</span><br><span class="line">$uploadfile = $uploaddir . basename($_FILES[&apos;file&apos;][&apos;name&apos;]);</span><br><span class="line"></span><br><span class="line">move_uploaded_file($_FILES[&apos;file&apos;][&apos;tmp_name&apos;], $uploadfile);</span><br><span class="line"></span><br><span class="line">echo json_encode($_FILES);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="三、NSURLSessionConfiguration"><a href="#三、NSURLSessionConfiguration" class="headerlink" title="三、NSURLSessionConfiguration"></a>三、NSURLSessionConfiguration</h3><p>NSURLConnection是全局性的，即它的配置对全局有效，如果有两个链接需要不同的cookies、证书这些公共资源，则NSURLConnection无法满足要求，这时NSURLSession的优势则体现出来，NSURLSession可以同过NSURLSessionConfiguration可以设置全局的网络访问属性。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];  </span><br><span class="line">// delegateQueue：请求完成回调函数和代理函数的运行线程，如果为nil则系统自动创建一个串行队列，不影响sessionTask的运行线程  </span><br><span class="line">NSURLSession *session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];</span><br></pre></td></tr></table></figure>
+<p>三种会话方式：  </p>
+<ol>
+<li>defaultSessionConfiguration：进程内会话（默认会话），类似 NSURLConnection的标准配置，用硬盘来缓存数据。  </li>
+<li>ephemeralSessionConfiguration：临时的进程内会话（内存），不会将cookie、缓存储存到本地，只会放到内存中，当应用程序退出后数据也会消失,可以用于实现“秘密浏览”  </li>
+<li>backgroundSessionConfiguration：建立后台会话可以在应用程序挂起，退出，崩溃的情况下运行上传和下载任务，后台另起一个线程。另外，系统会根据设备的负载程度决定分配下载的资源，因此有可能会很慢甚至超时失败。  </li>
+</ol>
+<p>设置一些网络属性:  </p>
+<ul>
+<li>HTTPAdditionalHeaders：可以设置出站请求的数据头</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">configuration.HTTPAdditionalHeaders = @&#123; </span><br><span class="line">    @&quot;Accept&quot;: @&quot;application/json&quot;,</span><br><span class="line">    @&quot;Accept-Language&quot;: @&quot;en&quot;,</span><br><span class="line">    @&quot;Authorization&quot;: authString, </span><br><span class="line">    @&quot;User-Agent&quot;: userAgentString</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>networkServiceType，设置网络服务类型  <ul>
+<li>NSURLNetworkServiceTypeDefault 默认  </li>
+<li>NSURLNetworkServiceTypeVoIP VoIP  </li>
+<li>NSURLNetworkServiceTypeVideo 视频  </li>
+<li>NSURLNetworkServiceTypeBackground 后台  </li>
+<li>NSURLNetworkServiceTypeVoice 语音  </li>
+</ul>
+</li>
+<li>allowsCellularAccess：允许蜂窝访问  </li>
+<li>timeoutIntervalForRequest：请求的超时时长  </li>
+<li>requestCachePolicy：缓存策略  </li>
+</ul>
+<blockquote>
+<p>注意事项:如果是自定义会话并指定了代理，会话会对代理进行强引用,在视图控制器销毁之前，需要取消网络会话，否则会造成内存泄漏  </p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/26/ios-runtime/" rel="next" title="iOS runtime简介">
+                <i class="fa fa-chevron-left"></i> iOS runtime简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/08/ios-uibezierpath-cashapelayer/" rel="prev" title="UIBezierPath和CAShapeLayer应用">
+                UIBezierPath和CAShapeLayer应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="吴克修" />
+            
+              <p class="site-author-name" itemprop="name">吴克修</p>
+              <p class="site-description motion-element" itemprop="description">iOS开发 宅男 π</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原生网络请求了解下"><span class="nav-number">1.</span> <span class="nav-text">原生网络请求了解下</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、URL-Session的基本概念"><span class="nav-number">1.1.</span> <span class="nav-text">一、URL Session的基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、相关的类"><span class="nav-number">1.2.</span> <span class="nav-text">二、相关的类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、NSURLSessionConfiguration"><span class="nav-number">1.3.</span> <span class="nav-text">三、NSURLSessionConfiguration</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">吴克修</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

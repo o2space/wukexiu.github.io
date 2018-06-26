@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="类添加属性问题:“如何给OC对象（如 NSArray、UIViewController等）添加一个属性，且不使用继承的情况下。”   类扩展、分类+关联对象(runtime)第一种 类扩展 （Class Extension也有人称为匿名分类）    作用： 能为某个类附加额外的属性，成员变量，方法声明 一般的类扩展写到.m文件中 一般的私有属性写到类扩展   使用格式：  1234@interfa">
+<meta name="keywords" content="iOS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS runtime应用：关联对象">
+<meta property="og:url" content="http://yoursite.com/2016/11/24/ios-runtime-association/index.html">
+<meta property="og:site_name" content="打工仔-吴克修のCODE有毒">
+<meta property="og:description" content="类添加属性问题:“如何给OC对象（如 NSArray、UIViewController等）添加一个属性，且不使用继承的情况下。”   类扩展、分类+关联对象(runtime)第一种 类扩展 （Class Extension也有人称为匿名分类）    作用： 能为某个类附加额外的属性，成员变量，方法声明 一般的类扩展写到.m文件中 一般的私有属性写到类扩展   使用格式：  1234@interfa">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-26T13:35:12.536Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS runtime应用：关联对象">
+<meta name="twitter:description" content="类添加属性问题:“如何给OC对象（如 NSArray、UIViewController等）添加一个属性，且不使用继承的情况下。”   类扩展、分类+关联对象(runtime)第一种 类扩展 （Class Extension也有人称为匿名分类）    作用： 能为某个类附加额外的属性，成员变量，方法声明 一般的类扩展写到.m文件中 一般的私有属性写到类扩展   使用格式：  1234@interfa">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/11/24/ios-runtime-association/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>iOS runtime应用：关联对象 | 打工仔-吴克修のCODE有毒</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">打工仔-吴克修のCODE有毒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">工作不止眼前的需求和Bug，还有诗和远方。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/11/24/ios-runtime-association/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="吴克修">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="打工仔-吴克修のCODE有毒">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">iOS runtime应用：关联对象
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-11-24 16:16:36" itemprop="dateCreated datePublished" datetime="2016-11-24T16:16:36+08:00">2016-11-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-06-26 21:35:12" itemprop="dateModified" datetime="2018-06-26T21:35:12+08:00">2018-06-26</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/iOS/" itemprop="url" rel="index"><span itemprop="name">iOS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="类添加属性"><a href="#类添加属性" class="headerlink" title="类添加属性"></a>类添加属性</h3><p><strong>问题:</strong>“如何给OC对象（如 NSArray、UIViewController等）添加一个属性，且不使用继承的情况下。”  </p>
+<h4 id="类扩展、分类-关联对象-runtime"><a href="#类扩展、分类-关联对象-runtime" class="headerlink" title="类扩展、分类+关联对象(runtime)"></a>类扩展、分类+关联对象(runtime)</h4><p><strong>第一种 类扩展 （Class Extension也有人称为匿名分类）</strong>  </p>
+<ul>
+<li>作用：<ul>
+<li>能为某个类附加额外的属性，成员变量，方法声明</li>
+<li>一般的类扩展写到.m文件中</li>
+<li>一般的私有属性写到类扩展</li>
+</ul>
+</li>
+<li>使用格式：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@interface NSArray()</span><br><span class="line">//属性</span><br><span class="line">//方法</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p><strong>第二种 分类+关联对象(runtime)</strong>  </p>
+<p>先介绍下分类：  </p>
+<ul>
+<li>分类的小括号中必须有名字  </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@interface 类名（分类名字）</span><br><span class="line">/*方法声明*/</span><br><span class="line">@end</span><br><span class="line">@implementation 类名（分类名字）</span><br><span class="line">/*方法实现*/</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<ul>
+<li>分类只能扩充方法，不能扩展属性和成员变量（如果包含成员变量会直接报错）</li>
+<li>如果分类中声明了一个属性，<strong>那么分类只会生成这个属性的set、get方法声明</strong>，也就是不会有实现。</li>
+<li>举例说明：如果我们分别在，类扩展与分类中添加了两个属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//类别</span><br><span class="line">@interface UIViewController(My)</span><br><span class="line">@property(nonatomic,copy)NSString *mOne;</span><br><span class="line">@end</span><br><span class="line">//类扩展</span><br><span class="line">@interface UIViewController()</span><br><span class="line">@property(nonatomic,copy)NSString *mTwo;</span><br><span class="line">@end</span><br><span class="line">-(instancetype)init&#123;</span><br><span class="line">  if (self = [super init]) &#123;</span><br><span class="line">      self.mTwo = @&quot;two two&quot;;</span><br><span class="line">      self.mOne = @&quot;one one&quot;;//这行报错 崩溃</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>po self.mOne<br>error: property ‘mOne’ not found on object of type ‘UIViewController’<br>意思是说，我们所创建的对象中并没有mOne这个属性。也就是说虽然我们再类别中声明属性不会报错，但是<strong>@property并没有自动为我们设置的属性生成set、get方法</strong>。</p>
+</blockquote>
+<p>现在我们结合关联对象来实现<br><strong>什么是关联对象</strong><br>关联对象是指某个OC对象通过一个唯一的key连接到一个类的实例上。<br>举个例子：xiaoming是Person类的一个实例，他的dog（一个OC对象）通过一根绳子（key）被他牵着散步，这可以说xiaoming和dog是关联起来的，当然xiaoming可以牵着多个dog。<br><strong>怎样关联对象</strong><br>runtime提供給我们的方法：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//关联对象</span><br><span class="line">void objc_setAssociatedObject(id object, const void *key, id value, objc_AssociationPolicy policy)</span><br><span class="line">//获取关联的对象</span><br><span class="line">id objc_getAssociatedObject(id object, const void *key)</span><br><span class="line">//移除关联的对象</span><br><span class="line">void objc_removeAssociatedObjects(id object)</span><br></pre></td></tr></table></figure>
+<p>变量说明：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">id object：被关联的对象（如xiaoming）</span><br><span class="line">const void *key：关联的key，要求唯一</span><br><span class="line">id value：关联的对象（如dog）</span><br><span class="line">objc_AssociationPolicy policy：内存管理的策略</span><br></pre></td></tr></table></figure>
+<p>objc_AssociationPolicy policy的enum值有：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">OBJC_ASSOCIATION_ASSIGN = 0, //弱引用关联对象</span><br><span class="line">//等价于@property (assign) ， @property (unsafe_unretained)</span><br><span class="line"></span><br><span class="line">OBJC_ASSOCIATION_RETAIN_NONATOMIC = 1, //强引用关联对象，且为非原子操作</span><br><span class="line">//等价于@property (strong, nonatomic)</span><br><span class="line"></span><br><span class="line">OBJC_ASSOCIATION_COPY_NONATOMIC = 3, //复制关联对象，且为非原子操作</span><br><span class="line">//等价于@property (copy, nonatomic)</span><br><span class="line"></span><br><span class="line">OBJC_ASSOCIATION_RETAIN = 01401, //强引用关联对象，且为原子操作</span><br><span class="line">//等价于@property (strong, atomic)</span><br><span class="line"></span><br><span class="line">OBJC_ASSOCIATION_COPY = 01403 //复制关联对象，且为原子操作</span><br><span class="line">等价于@property (copy, atomic)</span><br><span class="line"></span><br><span class="line">//其中，第 2 种与第 4 种、第 3 种与第 5 种关联策略的唯一差别就在于操作是否具有原子性</span><br></pre></td></tr></table></figure>
+<p>当对象被释放时，会根据这个策略来决定是否释放关联的对象，当策略是RETAIN/COPY时，会释放（release）关联的对象，当是ASSIGN，将不会释放。<br>值得注意的是，我们不需要主动调用removeAssociated来接触关联的对象，如果需要解除指定的对象，可以使用setAssociatedObject置nil来实现。  </p>
+<h3 id="关联对象的应用"><a href="#关联对象的应用" class="headerlink" title="关联对象的应用"></a>关联对象的应用</h3><h4 id="添加公共属性"><a href="#添加公共属性" class="headerlink" title="添加公共属性"></a>添加公共属性</h4><p>这是最常用的一个模式，通常我们会在类声明里面添加属性，但是出于某些需求（如前言描述的情况），我们需要在分类里添加一个或多个属性的话，编译器就会报错，这个问题的解决方案就是使用runtime的关联对象。<br>应用举例：<br>我们需要自定义一个tabbar，并暴露公共的属性和方法。（读者们可以思考下使用继承和分类实现的优点和不足之处）  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@interface UITabBarController (Custom)</span><br><span class="line">@property (nonatomic, strong) MyCustomTabbar * customTabbar;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#import &quot;UITabBarController+Custom.h&quot;</span><br><span class="line">#import &lt;objc/runtime.h&gt;</span><br><span class="line">@implementation UITabBarController (Custom)</span><br><span class="line">- (void)setCustomTabbar:(MyCustomTabbar *)customTabbar &#123;</span><br><span class="line">//这里使用方法的指针地址作为唯一的key</span><br><span class="line">    objc_setAssociatedObject(self, @selector(customTabbar), customTabbar, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line">- (MyCustomTabbar *)customTabbar &#123; </span><br><span class="line">    return objc_getAssociatedObject(self, @selector(customTabbar));</span><br><span class="line">&#125;</span><br><span class="line">//其他方法...</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p>这样，我们就可以像原生的tabbar一样使用自定义的tabbar：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[self.tabBarController.customTabbar doSomgthig];</span><br></pre></td></tr></table></figure>
+<h4 id="添加私有成员变量"><a href="#添加私有成员变量" class="headerlink" title="添加私有成员变量"></a>添加私有成员变量</h4><p>有时候，需要在分类中添加不想暴露在公共声明的成员变量。应用举例：給按钮添加点击时间的回调  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@interface UIButton (Callback)</span><br><span class="line">- (instancetype)initWithFrame:(CGRect)frame callback:(void (^)(UIButton *))callbackBlock;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">@interface UIButton ()</span><br><span class="line">@property (nonatomic, copy) void (^callbackBlock)(UIButton * button);</span><br><span class="line">@end</span><br><span class="line">@implementation UIButton (Callback)</span><br><span class="line">- (void (^)(UIButton *))callbackBlock &#123; </span><br><span class="line">  return objc_getAssociatedObject(self, @selector(callbackBlock));</span><br><span class="line">&#125;</span><br><span class="line">- (void)setCallbackBlock:(void (^)(UIButton *))callbackBlock &#123;</span><br><span class="line">  objc_setAssociatedObject(self, @selector(callbackBlock), callbackBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);</span><br><span class="line">&#125;</span><br><span class="line">- (instancetype)initWithFrame:(CGRect)frame callback:(void (^)(UIButton *))callbackBlock &#123;</span><br><span class="line">  if (self = [super initWithFrame:frame]) </span><br><span class="line">  &#123;</span><br><span class="line">    self.callbackBlock = callbackBlock;</span><br><span class="line">    [self addTarget:self action:@selector(didClickAction:) forControlEvents:UIControlEventTouchUpInside];</span><br><span class="line">  &#125; return self;</span><br><span class="line">&#125;</span><br><span class="line">- (void)didClickAction:(UIButton *)button &#123;</span><br><span class="line">  self.callbackBlock(button);</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<p>PS：以上代码是否会存在内存管理的问题</p>
+<h4 id="关联KVO观察者"><a href="#关联KVO观察者" class="headerlink" title="关联KVO观察者"></a>关联KVO观察者</h4><p>有时候我们在分类中使用KVO，推荐使用关联的对象作为观察者，尽量避免对象观察自身。<br>此应用模式不再举例，有兴趣的读者可以自行深入研究，或者将代码贴到评论处。  </p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/iOS/" rel="tag"># iOS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/24/ios-launch/" rel="next" title="获取App启动页LaunchImage或LaunchScreen">
+                <i class="fa fa-chevron-left"></i> 获取App启动页LaunchImage或LaunchScreen
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/26/ios-runtime/" rel="prev" title="iOS runtime简介">
+                iOS runtime简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="吴克修" />
+            
+              <p class="site-author-name" itemprop="name">吴克修</p>
+              <p class="site-description motion-element" itemprop="description">iOS开发 宅男 π</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#类添加属性"><span class="nav-number">1.</span> <span class="nav-text">类添加属性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#类扩展、分类-关联对象-runtime"><span class="nav-number">1.1.</span> <span class="nav-text">类扩展、分类+关联对象(runtime)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关联对象的应用"><span class="nav-number">2.</span> <span class="nav-text">关联对象的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#添加公共属性"><span class="nav-number">2.1.</span> <span class="nav-text">添加公共属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#添加私有成员变量"><span class="nav-number">2.2.</span> <span class="nav-text">添加私有成员变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关联KVO观察者"><span class="nav-number">2.3.</span> <span class="nav-text">关联KVO观察者</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">吴克修</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
